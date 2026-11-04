@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YUTOO — Portfolio</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: 
+      linear-gradient(rgba(160,195,225,0.32), rgba(160,195,225,0.32)),
+      #e8f0f7 url('bg-mandala.jpg') center center fixed;
+    background-size: cover;
+    color: #2a3a4a;
+    font-family: "STKaiti", "KaiTi", "楷体", "Kaiti SC", "FangSong", serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { text-decoration: none; color: inherit; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 40px;
+    z-index: 100;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-weight: 600; font-size: 15px; letter-spacing: 2px;
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    font-size: 13px; font-weight: 300; letter-spacing: 1px;
+    color: #4a6a8a; transition: color .2s;
+  }
+  .nav-links a:hover { color: #2a4a6a; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+  }
+  .title {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    user-select: none;
+    cursor: default;
+    padding: 22px 44px;
+    background: rgba(255,255,255,0.65);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(50,80,120,0.12);
+    text-align: center;
+  }
+  .title-main {
+    font-size: clamp(24px, 4.2vw, 46px);
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    color: #1f3a55;
+    margin-bottom: 10px;
+  }
+  .title-sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    font-size: clamp(13px, 1.4vw, 17px);
+    letter-spacing: 0.1em;
+    color: #5a7a9a;
+  }
+  .title-en {
+    font-family: "Brush Script MT", "Lucida Handwriting", "Segoe Script", cursive;
+    font-size: clamp(15px, 1.7vw, 20px);
+    color: #4a7aaa;
+    letter-spacing: 0.05em;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: rgba(225,238,249,0.45);
+    z-index: 2;
+  }
+  .cards-layer {
+    position: absolute; inset: 0;
+    z-index: 3;
+  }
+  .card {
+    position: absolute; left: 0; top: 0;
+    display: block;
+    will-change: transform;
+    cursor: pointer;
+  }
+  .card-inner {
+    width: 100%; height: 100%;
+    box-shadow: 0 6px 18px rgba(50,80,120,0.12);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease;
+    will-change: transform;
+    position: relative;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-color: #fff;
+    padding: 14px;
+  }
+  .card:hover .card-inner {
+    transform: translateY(-6px) scale(1.04);
+    box-shadow: 0 18px 38px rgba(50,80,120,0.22);
+  }
+
+  /* ---------- Card types ---------- */
+  /* Polaroid */
+  .polaroid {
+    background: #fff;
+    padding: 12px 12px 20px;
+    border-radius: 2px;
+    display: flex; flex-direction: column;
+    height: 100%;
+  }
+  .polaroid .photo {
+    flex: 1; border-radius: 2px;
+    background-size: cover; background-position: center;
+  }
+  .polaroid .caption {
+    font-family: "STKaiti", "KaiTi", serif;
+    font-size: 10px; color: #6a8aab; text-align: center;
+    margin-top: 6px; letter-spacing: 1px;
+  }
+
+  /* Notebook */
+  .notebook {
+    background: #fff;
+    border-radius: 3px;
+    padding: 14px 16px;
+    background-image: repeating-linear-gradient(
+      transparent, transparent 17px,
+      rgba(120,160,200,0.2) 18px
+    );
+    height: 100%;
+  }
+  .notebook .tag {
+    font-size: 10px; color: #6a8aab; letter-spacing: 1px;
+    position: relative; top: 2px;
+  }
+
+  /* Sticker */
+  .sticker {
+    background: #fff;
+    border: none;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    height: 100%;
+  }
+  .sticker .tag {
+    font-size: 11px; color: #3a5a7a; letter-spacing: 1.5px;
+    font-weight: 400;
+  }
+
+  /* Photo gradients (placeholder art) */
+  .ph-1 { background: linear-gradient(135deg, #d4e4f2 0%, #7a9fc4 100%); }
+  .ph-2 { background: linear-gradient(160deg, #e4edf5 0%, #6a8aaa 100%); }
+  .ph-3 { background: linear-gradient(135deg, #e8f0f7 0%, #8aa8c8 100%); }
+  .ph-4 { background: linear-gradient(150deg, #dce8f3 0%, #6a90b5 100%); }
+  .ph-5 { background: linear-gradient(135deg, #eaf2f8 0%, #7a9abf 100%); }
+  .ph-6 { background: linear-gradient(160deg, #d8e5f0 0%, #8aadc9 100%); }
+
+  /* ---------- Hint / scroll ---------- */
+  .hint {
+    position: absolute; bottom: 32px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px; letter-spacing: 2px; color: #9ab0c8;
+    z-index: 4;
+    text-transform: uppercase;
+  }
+
+  /* ---------- Lower content (scroll spacer) ---------- */
+  .section {
+    min-height: auto;
+    padding: 70px 60px;
+    max-width: 900px;
+    margin: 60px auto;
+    background: rgba(255,255,255,0.62);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(50,80,120,0.08);
+  }
+  .section h2 {
+    font-weight: 200; font-size: 36px; letter-spacing: 4px;
+    margin-bottom: 30px;
+    color: #2a3a4a;
+  }
+  .section p { color: #4a6078; line-height: 1.9; font-size: 14px; font-weight: 300; }
+
+  @media (max-width: 768px) {
+    .nav { padding: 18px 20px; }
+    .nav-links { gap: 18px; }
+    .nav-links a { font-size: 12px; }
+    .section { padding: 80px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">张</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#works">Works</a>
+    <a href="#experience">Experience</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="hero-overlay"></div>
+  <div class="cards-layer" id="cardsLayer">
+    <!-- 5 work cards -->
+    <a class="card" data-page="work-1" style="width:120px;height:150px;">
+      <div class="card-inner polaroid" style="background: url('card-1.png') center;">
+        <div class="photo ph-1"></div>
+        <div class="caption">Brand Identity</div>
+      </div>
+    </a>
+    <a class="card" data-page="work-2" style="width:110px;height:140px;">
+      <div class="card-inner polaroid" style="background: url('card-2.png') center;">
+        <div class="photo ph-2"></div>
+        <div class="caption">E-commerce App</div>
+      </div>
+    </a>
+    <a class="card" data-page="work-3" style="width:140px;height:100px;">
+      <div class="card-inner notebook" style="background: url('card-3.png') center;">
+        <div class="tag">EDITORIAL — Vol.07</div>
+      </div>
+    </a>
+    <a class="card" data-page="work-4" style="width:110px;height:110px;">
+      <div class="card-inner sticker" style="background: url('card-4.png') center;">
+        <div class="tag">3D<br>Visual</div>
+      </div>
+    </a>
+    <a class="card" data-page="work-5" style="width:125px;height:155px;">
+      <div class="card-inner polaroid" style="background: url('card-1.png') center;">
+        <div class="photo ph-3"></div>
+        <div class="caption">Campaign</div>
+      </div>
+    </a>
+
+    <!-- 5 process cards -->
+    <a class="card" data-page="process-1" style="width:135px;height:105px;">
+      <div class="card-inner notebook" style="background: url('card-2.png') center;">
+        <div class="tag">SKETCHBOOK — p.12</div>
+      </div>
+    </a>
+    <a class="card" data-page="process-2" style="width:105px;height:105px;">
+      <div class="card-inner sticker" style="background: url('card-3.png') center;">
+        <div class="tag">Mood<br>Board</div>
+      </div>
+    </a>
+    <a class="card" data-page="process-3" style="width:115px;height:145px;">
+      <div class="card-inner polaroid" style="background: url('card-4.png') center;">
+        <div class="photo ph-4"></div>
+        <div class="caption">Wireframe</div>
+      </div>
+    </a>
+    <a class="card" data-page="process-4" style="width:100px;height:100px;">
+      <div class="card-inner sticker" style="background: url('card-1.png') center;">
+        <div class="tag">ITERATE</div>
+      </div>
+    </a>
+    <a class="card" data-page="process-5" style="width:130px;height:100px;">
+      <div class="card-inner notebook" style="background: url('card-2.png') center;">
+        <div class="tag">STUDY — color / type</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="title" id="title">
+    <div class="title-main">数字经济 2501</div>
+    <div class="title-sub">
+      <span>张筱周</span>
+      <span class="title-en">Zhang Xiaozhou</span>
+    </div>
+  </div>
+  <div class="hint" id="hint">scroll</div>
+</section>
+
+<section class="section" id="about">
+  <h2>About</h2>
+  <p>Placeholder — about section.</p>
+</section>
+<section class="section" id="works">
+  <h2>Works</h2>
+  <p>Placeholder — works section.</p>
+</section>
+<section class="section" id="experience">
+  <h2>Experience</h2>
+  <p>Placeholder — experience section.</p>
+</section>
+<section class="section" id="contact">
+  <h2>Contact</h2>
+  <p>Placeholder — contact section.</p>
+</section>
+
+<script>
+(function () {
+  const hero = document.getElementById('hero');
+  const title = document.getElementById('title');
+  const layer = document.getElementById('cardsLayer');
+  const cards = Array.from(document.querySelectorAll('.card'));
+
+  // ----- layout state -----
+  let W = 0, H = 0;
+  let centerX = 0, centerY = 0;
+  let clusterPoints = [];   // 8 preset points, relative to center
+  let gathered = false;
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+
+  const state = cards.map((el, i) => {
+    const rect = el.getBoundingClientRect();
+    return {
+      el,
+      w: rect.width,
+      h: rect.height,
+      x: 0, y: 0,        // current center pos (hero-relative)
+      vx: 0, vy: 0,
+      idleX: 0, idleY: 0,
+      phase: Math.random() * Math.PI * 2,
+      floatAmp: 6 + Math.random() * 8,
+      floatSpeed: 0.0008 + Math.random() * 0.0006,  // rad/ms
+      swayAmp: 2.5 + Math.random() * 3,
+      baseRot: (Math.random() - 0.5) * 12,
+      init: false
+    };
+  });
+
+  function computeClusterPoints() {
+    const mobile = W < 768;
+    // elliptical ring sized to clear the (wide) title: wider horizontally
+    const rx = mobile ? 165 : 430;
+    const ry = mobile ?  75 : 120;
+    clusterPoints = [
+      { x: -rx * 0.82, y: -ry * 0.85 },  // top-left
+      { x: 0,          y: -ry },          // top
+      { x:  rx * 0.82, y: -ry * 0.85 },  // top-right
+      { x:  rx,        y: 0 },            // right
+      { x:  rx * 0.82, y:  ry * 0.85 },  // bottom-right
+      { x: 0,          y:  ry },          // bottom
+      { x: -rx * 0.82, y:  ry * 0.85 },  // bottom-left
+      { x: -rx,        y: 0 },            // left
+    ];
+  }
+
+  function scatterIdlePositions() {
+    const margin = 50;
+    const mobile = W < 768;
+    const minDist = mobile ? 100 : 150;
+    const clearCenter = mobile ? 90 : 150;
+    state.forEach((c, i) => {
+      let placed = null;
+      for (let attempt = 0; attempt < 800; attempt++) {
+        const px = margin + Math.random() * (W - margin * 2);
+        const py = margin + Math.random() * (H - margin * 2);
+        if (Math.hypot(px - centerX, py - centerY) < clearCenter) continue;
+        let ok = true;
+        for (let j = 0; j < i; j++) {
+          if (Math.hypot(px - state[j].idleX, py - state[j].idleY) < minDist) { ok = false; break; }
+        }
+        if (ok) { placed = { x: px, y: py }; break; }
+      }
+      if (!placed) {
+        placed = {
+          x: margin + Math.random() * (W - margin * 2),
+          y: margin + Math.random() * (H - margin * 2)
+        };
+      }
+      c.idleX = placed.x;
+      c.idleY = placed.y;
+      if (!c.init) {
+        c.x = placed.x; c.y = placed.y;
+        c.init = true;
+      }
+    });
+  }
+
+  function relayout() {
+    W = hero.clientWidth;
+    H = hero.clientHeight;
+    centerX = W / 2;
+    centerY = H / 2;
+    computeClusterPoints();
+    scatterIdlePositions();
+  }
+
+  // ----- spring physics -----
+  const STIFF = 0.055;   // high stiffness
+  const DAMP  = 0.86;    // medium damping
+
+  function targetFor(i) {
+    if (!gathered) return { x: state[i].idleX, y: state[i].idleY };
+    const slot = clusterPoints[i % clusterPoints.length];
+    let ox = 0, oy = 0;
+    if (i >= clusterPoints.length) {
+      // two extra cards: offset slightly so they don't overlap
+      ox = (i === clusterPoints.length) ? 32 : -32;
+      oy = (i === clusterPoints.length) ? 32 : -32;
+    }
+    return { x: centerX + slot.x + ox, y: centerY + slot.y + oy };
+  }
+
+  let lastT = performance.now();
+  function tick(now) {
+    const dt = Math.min(2, (now - lastT) / 16.67); // normalize to ~60fps units
+    lastT = now;
+    const t = now;
+
+    for (let i = 0; i < state.length; i++) {
+      const c = state[i];
+      const tgt = targetFor(i);
+
+      // spring (semi-implicit Euler, dt-scaled)
+      c.vx += (tgt.x - c.x) * STIFF * dt;
+      c.vy += (tgt.y - c.y) * STIFF * dt;
+      c.vx *= Math.pow(DAMP, dt);
+      c.vy *= Math.pow(DAMP, dt);
+      c.x += c.vx * dt;
+      c.y += c.vy * dt;
+
+      // idle floating overlay
+      const fy = Math.sin(t * c.floatSpeed + c.phase) * c.floatAmp;
+      const sway = Math.sin(t * c.floatSpeed * 0.8 + c.phase) * c.swayAmp;
+      // motion-based rotation (organic feel)
+      const velRot = Math.max(-9, Math.min(9, c.vx * 1.4));
+      const rot = c.baseRot + sway + velRot;
+
+      c.el.style.transform =
+        `translate3d(${c.x - c.w / 2}px, ${c.y + fy - c.h / 2}px, 0) rotate(${rot}deg)`;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // ----- magnetic / proximity -----
+  function setGathered(v) { gathered = v; }
+
+  window.addEventListener('mousemove', (e) => {
+    if (isCoarse) return;
+    const rect = hero.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    // only count when hero is roughly on screen
+    if (rect.bottom < 0 || rect.top > window.innerHeight) { setGathered(false); return; }
+    const d = Math.hypot(mx - centerX, my - centerY);
+    setGathered(d < 300);
+  }, { passive: true });
+
+  // mobile: tap title toggles
+  if (isCoarse) {
+    title.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setGathered(!gathered);
+    });
+  }
+
+  // ----- scroll: fade + parallax -----
+  function onScroll() {
+    const heroH = hero.offsetHeight;
+    const y = window.scrollY;
+    const p = Math.min(1, Math.max(0, y / heroH));
+    hero.style.opacity = String(1 - p);
+    layer.style.transform = `translate3d(0, ${p * 140}px, 0)`;
+    title.style.transform = `translate(-50%, -50%) translateY(${p * -60}px)`;
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // ----- resize -----
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(relayout, 150);
+  });
+
+  // ----- card click: JS navigation (not anchor scroll) -----
+  cards.forEach((el) => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const page = el.dataset.page;
+      if (!page) return;
+      // brief fade then navigate
+      hero.style.transition = 'opacity .25s ease';
+      hero.style.opacity = '0';
+      setTimeout(() => { window.location.href = page + '.html'; }, 250);
+    });
+  });
+
+  // ----- init -----
+  relayout();
+  onScroll();
+  requestAnimationFrame((t) => { lastT = t; requestAnimationFrame(tick); });
+})();
+</script>
+</body>
+</html>
